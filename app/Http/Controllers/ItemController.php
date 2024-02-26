@@ -6,9 +6,7 @@ use App\Models\Item;
 use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Validator;
-// use MongoDB\Laravel\Eloquent\Casts\ObjectId;
 use MongoDB\BSON\ObjectId;
-use Illuminate\Support\Facades\Log;
 
 class ItemController extends Controller
 {
@@ -48,38 +46,6 @@ class ItemController extends Controller
         return response()->json(['item' => $item]);
     }
 
-    // public function getItemsWithCategoryDetails() {
-    //     // Perform $lookup aggregation
-    //     $itemsWithCategoryDetails = Item::raw(function ($collection) {
-    //         return $collection->aggregate([
-    //             [
-    //                 '$lookup' => [
-    //                     'from' => 'categories',
-    //                     'localField' => 'category_id',
-    //                     'foreignField' => '_id',
-    //                     'as' => 'category',
-    //                 ],
-    //             ],
-    //             [
-    //                 '$unwind' => '$category',
-    //             ],
-    //             [
-    //                 '$project' => [
-    //                     'name' => 1,
-    //                     'description' => 1,
-    //                     'price' => 1,
-    //                     'quantity' => 1,
-    //                     'category_id' => 1,
-    //                     'category' => '$category',
-    //                 ],
-    //             ],
-    //         ]);
-    //     });
-
-    //     //return items with category details
-    //     return response()->json(['items' => $itemsWithCategoryDetails]);
-    // }
-
     public function createItem(Request $request) {
         //validation
         $validator = Validator::make($request->all(), [
@@ -103,7 +69,6 @@ class ItemController extends Controller
             $item->quantity = $request->input('quantity');
 
             $category_id = $request->input('category_id');
-            // dd($category_id);
             $item->category_id = new ObjectId($category_id);
 
             //save to DB
@@ -148,7 +113,7 @@ class ItemController extends Controller
             $item->price = $request->input('price');
             $item->quantity = $request->input('quantity');
             $item->category_id = new ObjectId($request->input('category_id'));
-
+            
             //save sa DB
             $item->save();
 
@@ -182,7 +147,6 @@ class ItemController extends Controller
     }
 
     public function getItemsWithCategoryDetails() {
-        // Perform $lookup aggregation
         $itemsWithCategoryDetails = Item::raw(function ($collection) {
             return $collection->aggregate([
                 [
@@ -209,10 +173,6 @@ class ItemController extends Controller
             ]);
         });
     
-        // Log the result for debugging
-        Log::info($itemsWithCategoryDetails);
-    
-        //return items with category details
         return response()->json(['items' => $itemsWithCategoryDetails]);
     }
 }
